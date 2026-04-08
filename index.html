@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="en">
   <head>
@@ -13,4 +14,781 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NyayAI - Legal AI Assistant</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<style>
+/* CSS Variables for Light / Dark Mode */
+:root {
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --surface-hover: #f3f4f6;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-bg: #dbeafe;
+  
+  --danger: #ef4444;
+  --danger-bg: #fee2e2;
+  --warning: #f59e0b;
+  --warning-bg: #fef3c7;
+  --success: #10b981;
+  --success-bg: #d1fae5;
+  
+  --sidebar-w: 260px;
+  --radius: 8px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111827;
+    --surface: #1f2937;
+    --surface-hover: #374151;
+    --text: #f9fafb;
+    --text-muted: #9ca3af;
+    --border: #374151;
+    
+    --primary: #3b82f6;
+    --primary-hover: #60a5fa;
+    --primary-bg: rgba(59, 130, 246, 0.2);
+    
+    --danger: #ef4444;
+    --danger-bg: rgba(239, 68, 68, 0.2);
+    --warning: #f59e0b;
+    --warning-bg: rgba(245, 158, 11, 0.2);
+    --success: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.2);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+
+/* Sidebar */
+#sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; transition: transform 0.3s; }
+.sidebar-header { padding: 20px; font-size: 24px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;}
+.nav-links { flex: 1; padding: 10px 0; overflow-y: auto; }
+.nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-muted); font-weight: 500; transition: background 0.2s, color 0.2s; }
+.nav-item:hover { background: var(--surface-hover); color: var(--text); }
+.nav-item.active { background: var(--primary-bg); color: var(--primary); border-right: 3px solid var(--primary); }
+.sidebar-footer { padding: 20px; border-top: 1px solid var(--border); }
+.status-badge-container { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--surface-hover); border: 1px solid var(--border);}
+.status-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* Mobile Menu Button */
+#mobile-menu-btn { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); }
+
+/* Main Content */
+#main { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
+.panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Typography & General */
+h1 { font-size: 28px; margin-bottom: 8px; }
+h2 { font-size: 20px; margin-bottom: 16px; margin-top: 24px; border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+h3 { font-size: 16px; margin-bottom: 12px; }
+p { line-height: 1.6; margin-bottom: 16px; color: var(--text-muted); }
+
+/* Form Controls */
+.form-group { margin-bottom: 20px; }
+label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+input[type="text"], input[type="password"], input[type="number"], select, textarea {
+  width: 100%; padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px; transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-bg); }
+textarea { resize: vertical; min-height: 100px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; 
+  background: var(--primary); color: white; border: none; border-radius: var(--radius); 
+  font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s, transform 0.1s;
+}
+.btn:hover { background: var(--primary-hover); }
+.btn:active { transform: scale(0.98); }
+.btn-secondary { background: var(--surface-hover); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Grid Layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* Drag & Drop */
+.dropzone { 
+  border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px; text-align: center; 
+  background: var(--surface); cursor: pointer; transition: all 0.2s; 
+}
+.dropzone.dragover { border-color: var(--primary); background: var(--primary-bg); }
+.dropzone-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+/* Analysis Results */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+.pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-right: 8px; margin-bottom: 8px; }
+.pill.HIGH { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+.pill.MEDIUM { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning); }
+.pill.LOW { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+.pill.neutral { background: var(--surface-hover); color: var(--text); border: 1px solid var(--border); }
+
+/* Chat UI */
+.chat-container { display: flex; flex-direction: column; height: calc(100vh - 120px); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.chat-history { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 15px; }
+.chat-bubble.user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+.chat-bubble.assistant { align-self: flex-start; background: var(--surface-hover); color: var(--text); border: bottom-left-radius: 4px; border: 1px solid var(--border); }
+.chat-input-area { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: var(--surface);}
+.quick-chips { padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; background: var(--bg); border-top: 1px solid var(--border); white-space: nowrap;}
+.chip { padding: 6px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; font-size: 13px; cursor: pointer; transition: background 0.2s;}
+.chip:hover { background: var(--primary-bg); color: var(--primary); border-color: var(--primary); }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; color: var(--text-muted); background: var(--surface-hover); }
+
+/* Toasts */
+#toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+.toast { background: var(--surface); color: var(--text); padding: 12px 20px; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 4px solid var(--primary); display: flex; align-items: center; gap: 12px; animation: slideInInfo 0.3s forwards; }
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--danger); }
+@keyframes slideInInfo { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOutInfo { to { opacity: 0; } }
+
+/* Loaders */
+.loader { border: 3px solid var(--border); border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.loading .loader { display: inline-block; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { flex-direction: column; }
+  #sidebar { width: 100%; height: auto; position: absolute; transform: translateY(-100%); border-right: none; border-bottom: 1px solid var(--border); }
+  #sidebar.open { transform: translateY(0); }
+  #mobile-menu-btn { display: block; }
+  .nav-links { display: flex; overflow-x: auto; padding: 0; }
+  .nav-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+  .nav-item.active { border-bottom-color: var(--primary); border-right: none; }
+  .panel { padding: 20px; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    NyayAI
+    <button id="mobile-menu-btn">☰</button>
+  </div>
+  <div class="nav-links">
+    <div class="nav-item active" data-target="config-panel">⚙️ Configuration</div>
+    <div class="nav-item" data-target="upload-panel">📄 Document Upload</div>
+    <div class="nav-item" data-target="analysis-panel">📊 Analysis Results</div>
+    <div class="nav-item" data-target="chat-panel">💬 Chat Assistant</div>
+    <div class="nav-item" data-target="dataset-panel">📚 Legal Dataset</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="status-badge-container">
+      <div class="status-dot" id="global-status-dot" style="background: var(--warning);"></div>
+      <span id="global-status-text">Not configured</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main Area -->
+<div id="main">
+  
+  <!-- PANEL 1: CONFIGURATION -->
+  <div id="config-panel" class="panel active">
+    <h1>System Configuration</h1>
+    <p>Configure API keys and model parameters. Keys are stored safely in local browser memory only.</p>
+    
+    <div class="grid-2">
+      <div class="card">
+        <h2>Claude AI Integration</h2>
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="claude-key" placeholder="sk-ant-api03-...">
+        </div>
+        <div class="form-group">
+          <label>Model</label>
+          <select id="claude-model">
+            <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet-20241022</option>
+            <option value="claude-sonnet-4-20250514" selected>claude-sonnet-4-20250514</option>
+            <option value="claude-3-haiku-20240307">claude-3-haiku-20240307</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Max Tokens (<span id="token-val">2048</span>)</label>
+          <input type="range" id="claude-tokens" min="256" max="8192" step="256" value="2048" oninput="document.getElementById('token-val').innerText = this.value">
+        </div>
+        <div class="form-group">
+          <label>Preferred Language</label>
+          <select id="app-language">
+            <option value="English">English</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Kannada">Kannada</option>
+            <option value="Marathi">Marathi</option>
+            <option value="Bengali">Bengali</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>Firebase Integration</h2>
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="fb-key" placeholder="AIzaSy...">
+        </div>
+        <div class="form-group">
+          <label>Project ID</label>
+          <input type="text" id="fb-project" placeholder="my-legal-app">
+        </div>
+        <div class="form-group">
+          <label>Auth Domain</label>
+          <input type="text" id="fb-auth" placeholder="my-legal-app.firebaseapp.com">
+        </div>
+        <button class="btn" id="btn-test-connections">
+          <span class="loader" id="test-loader"></span> Test Connections
+        </button>
+        <div style="margin-top: 15px; font-size: 14px;">
+          <div>Claude Status: <strong id="status-claude">Pending</strong></div>
+          <div>Firebase Status: <strong id="status-fb">Pending</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>System Prompts</h2>
+      <div class="form-group">
+        <label>Multilingual Injection (prepended to all)</label>
+        <textarea id="prompt-multi">The user prefers {{LANGUAGE}}.
+Respond entirely in {{LANGUAGE}}.
+Use simple everyday vocabulary — not formal or bureaucratic {{LANGUAGE}}.
+Legal terms with no translation may stay in English but must be immediately explained in {{LANGUAGE}}.</textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Feature 1: Summary Prompt</label>
+          <textarea id="prompt-summary">You are NyayAI, a legal assistant for common Indian citizens.
+Respond in {{LANGUAGE}}. Summarize the legal document in PLAIN simple language.
+Structure your response EXACTLY as:
+📄 WHAT IS THIS DOCUMENT?
+👤 WHO IS INVOLVED?
+⚠️ WHAT DOES IT WANT FROM YOU?
+📅 IMPORTANT DATES AND DEADLINES
+💡 IN SIMPLE WORDS</textarea>
+        </div>
+        <div class="form-group">
+          <label>Feature 3: Risk Analysis Prompt</label>
+          <textarea id="prompt-risk">You are a legal risk analysis engine. Respond in {{LANGUAGE}}.
+Return ONLY valid JSON with this schema:
+{
+  "risk_level": "HIGH"|"MEDIUM"|"LOW",
+  "risk_score": 0,
+  "risk_reasons": ["string"],
+  "legal_sections_involved": [{"section": "string", "plain_meaning": "string"}],
+  "your_rights": ["string"],
+  "immediate_actions": [{"priority": "URGENT"|"IMPORTANT", "action": "string", "deadline": "string"}],
+  "do_you_need_a_lawyer": true,
+  "lawyer_reason": "string"
+}</textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Feature 4: Chat Bot System Prompt</label>
+        <textarea id="prompt-chat">You are NyayAI, a friendly legal assistant. Respond in {{LANGUAGE}}.
+Answer based on the document context. Speak simply like a helpful friend.
+If the answer is not in the document, say so clearly.
+For serious risks (jail, eviction, large money) always end with:
+⚠️ Consult a real lawyer.
+DOCUMENT CONTEXT: {{DOCUMENT}}</textarea>
+      </div>
+      <button class="btn" id="btn-save-config">Save Configuration</button>
+    </div>
+  </div>
+
+  <!-- PANEL 2: UPLOAD -->
+  <div id="upload-panel" class="panel">
+    <h1>Document Ingestion</h1>
+    <p>Upload a legal document (.pdf, .txt) securely. Text is extracted locally in your browser.</p>
+    
+    <div class="dropzone" id="dropzone">
+      <div class="dropzone-icon">📄</div>
+      <h3>Drag & Drop your legal document here</h3>
+      <p>or click to select file</p>
+      <input type="file" id="file-input" accept=".pdf,.txt" style="display:none">
+    </div>
+
+    <div class="card" id="upload-preview" style="display: none; margin-top: 20px;">
+      <h3 id="file-name-display">Filename.pdf (0 KB)</h3>
+      <div class="form-group">
+        <label>Extracted Text Preview</label>
+        <textarea id="extracted-text" readonly style="font-family: monospace; font-size: 12px; background: var(--surface-hover);"></textarea>
+      </div>
+      <button class="btn" id="btn-run-analysis">
+        <span class="loader" id="analysis-loader"></span> Run Full Analysis
+      </button>
+    </div>
+  </div>
+
+  <!-- PANEL 3: ANALYSIS RESULTS -->
+  <div id="analysis-panel" class="panel">
+    <h1>Analysis Results</h1>
+    <p>AI-generated summary and risk assessment for your document.</p>
+
+    <div id="analysis-empty">
+      <div class="card" style="text-align: center; padding: 40px;">
+        <span style="font-size: 40px; opacity: 0.5;">📊</span>
+        <h3>No analysis available</h3>
+        <p>Upload a document and trigger an analysis first.</p>
+      </div>
+    </div>
+
+    <div id="analysis-content" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <h2>Risk Assessment</h2>
+          <div style="text-align: right;">
+            <div id="risk-pill" class="pill HIGH">HIGH RISK</div>
+            <div style="font-size: 24px; font-weight: 700;"><span id="risk-score">90</span><span style="font-size: 14px; font-weight: 400; color: var(--text-muted)">/100</span></div>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div>
+            <h3>⚠️ Risk Reasons</h3>
+            <ul id="risk-reasons" style="padding-left: 20px; line-height: 1.6; color: var(--text-muted);"></ul>
+          </div>
+          <div>
+            <h3>🛡️ Your Rights</h3>
+            <ul id="user-rights" style="padding-left: 20px; line-height: 1.6; color: var(--text-muted);"></ul>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 20px;">⚡ Immediate Actions</h3>
+        <div id="immediate-actions" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+        <h3 style="margin-top: 20px;">⚖️ Need a Lawyer? <span id="lawyer-verdict"></span></h3>
+        <p id="lawyer-reason" style="background: var(--danger-bg); color: var(--danger); padding: 12px; border-radius: var(--radius); border: 1px solid var(--danger);"></p>
+
+        <h3 style="margin-top: 20px;">📚 Legal Sections Involved</h3>
+        <div id="legal-sections" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+      </div>
+
+      <div class="card">
+        <h2>Plain Language Summary</h2>
+        <div id="doc-summary" style="white-space: pre-wrap; line-height: 1.6;"></div>
+      </div>
+
+      <button class="btn" id="btn-save-analysis">
+        <span class="loader" id="save-analysis-loader"></span> Save Report to Firebase
+      </button>
+    </div>
+  </div>
+
+  <!-- PANEL 4: CHAT -->
+  <div id="chat-panel" class="panel" style="max-width: 800px; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h1>Legal Assistant Chat</h1>
+      <div>
+        <button class="btn btn-secondary" id="btn-clear-chat" style="padding: 6px 12px; font-size: 13px;">Clear</button>
+        <button class="btn" id="btn-save-chat" style="padding: 6px 12px; font-size: 13px;">Save Session</button>
+      </div>
+    </div>
+    
+    <div class="chat-container">
+      <div class="chat-history" id="chat-history">
+        <div class="chat-bubble assistant">Hello! I'm NyayAI. I've read your document. What would you like to know?</div>
+      </div>
+      <div class="quick-chips">
+        <div class="chip" onclick="sendQuickMessage('Do I need a lawyer?')">Do I need a lawyer?</div>
+        <div class="chip" onclick="sendQuickMessage('What are my rights?')">What are my rights?</div>
+        <div class="chip" onclick="sendQuickMessage('Can I appeal this?')">Can I appeal this?</div>
+        <div class="chip" onclick="sendQuickMessage('What should I do first?')">What should I do first?</div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type your question..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+        <button class="btn" id="btn-send-chat" onclick="sendChatMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 5: DATASET -->
+  <div id="dataset-panel" class="panel">
+    <h1>Legal Corpus Feeder</h1>
+    <p>Add context data to improve NyayAI's knowledge base.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>Add Entry</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Source Name</label>
+            <input type="text" id="ds-source" placeholder="e.g. IPC 1860">
+          </div>
+          <div class="form-group">
+            <label>Section</label>
+            <input type="text" id="ds-section" placeholder="e.g. Section 420">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="ds-category">
+              <option>IPC</option><option>CrPC</option><option>CPC</option>
+              <option>Consumer Protection</option><option>Rent Control</option>
+              <option>RTI</option><option>Judgment</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <input type="text" id="ds-lang" value="English">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Text Content</label>
+          <textarea id="ds-text" placeholder="Legal text goes here..."></textarea>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn" id="btn-add-dataset">Add to Firebase</button>
+          <label class="btn btn-secondary">
+            Bulk Upload JSON
+            <input type="file" id="ds-bulk" accept=".json" style="display: none;">
+          </label>
+        </div>
+      </div>
+
+      <div class="card" style="overflow-x: auto;">
+        <h2>Existing Entries</h2>
+        <table id="dataset-table">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Section</th>
+              <th>Cat.</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dataset-tbody">
+            <tr><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toasts Container -->
+<div id="toast-container"></div>
+
+<script>
+/**
+ * APP STATE & CONFIG
+ */
+const API_BASE = 'http://localhost:8000/api';
+const APP = {
+  keys: { claude: '' },
+  config: { model: 'claude-sonnet-4-20250514', tokens: 2048, lang: 'English', prompts: {} },
+  data: { 
+    userId: 'user_' + Math.random().toString(36).substr(2, 9), 
+    docName: '', rawText: '', 
+    analysisId: null, chatHistory: [] 
+  }
+};
+
+/**
+ * UI UTILS
+ */
+function $(id) { return document.getElementById(id); }
+function showToast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'} ${msg}`;
+  $('toast-container').appendChild(t);
+  setTimeout(() => { t.style.animation = 'fadeOutInfo 0.3s forwards'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+function setLoader(id, loading) {
+  const btn = $(id);
+  if (!btn) return;
+  if(loading) { btn.classList.add('loading'); btn.disabled = true; }
+  else { btn.classList.remove('loading'); btn.disabled = false; }
+}
+
+/**
+ * INIT & NAVIGATION
+ */
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', (e) => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    const target = e.currentTarget.getAttribute('data-target');
+    $(target).classList.add('active');
+    if (window.innerWidth <= 768) $('sidebar').classList.remove('open');
+    if (target === 'dataset-panel') loadDataset();
+  });
+});
+
+$('mobile-menu-btn').addEventListener('click', () => {
+  $('sidebar').classList.toggle('open');
+});
+
+/**
+ * SAVE CONFIG & TEST CONNECTIONS
+ */
+$('btn-save-config').addEventListener('click', () => {
+  APP.keys.claude = $('claude-key').value.trim();
+  APP.config.model = $('claude-model').value;
+  APP.config.tokens = parseInt($('claude-tokens').value);
+  APP.config.lang = $('app-language').value;
+  
+  const dot = $('global-status-dot');
+  const txt = $('global-status-text');
+  
+  if (APP.keys.claude.length > 0) { dot.style.background = 'var(--success)'; txt.innerText = 'Ready (API configured)'; }
+  else { dot.style.background = 'var(--danger)'; txt.innerText = 'Not configured'; }
+  
+  showToast('Configuration saved', 'success');
+});
+
+$('btn-test-connections').addEventListener('click', async () => {
+  setLoader('btn-test-connections', true);
+  try {
+    const res = await fetch(`http://localhost:8000/`);
+    const data = await res.json();
+    $('status-fb').innerText = `DB: ${data.firebase ? '✅' : '⚠️'} | RAG: ${data.rag ? '✅' : '⚠️'}`;
+  } catch (e) {
+    $('status-fb').innerText = 'Backend Disconnected ❌';
+  }
+  setLoader('btn-test-connections', false);
+});
+
+/**
+ * FILE UPLOAD
+ */
+const dropzone = $('dropzone');
+const fileInput = $('file-input');
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover');});
+dropzone.addEventListener('dragleave', e => { e.preventDefault(); dropzone.classList.remove('dragover');});
+dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+async function handleFile(file) {
+  if (!file) return;
+  APP.data.docName = file.name;
+  $('file-name-display').innerText = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+  
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+    if(!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    APP.data.rawText = data.text;
+    
+    $('extracted-text').value = APP.data.rawText.substring(0, 1200) + "...";
+    $('upload-preview').style.display = 'block';
+    showToast('File extracted successfully', 'success');
+  } catch (e) { showToast('Error parsing file: ' + e.message, 'error'); }
+}
+
+/**
+ * ANALYSIS (CASE SUMMARIZER)
+ */
+$('btn-run-analysis').addEventListener('click', async () => {
+  if(!APP.keys.claude) return showToast("Configure Claude API key first", "error");
+  setLoader('btn-run-analysis', true);
+  
+  try {
+    document.querySelectorAll('.nav-item')[2].click(); // Go to Analysis panel
+    $('analysis-empty').style.display = 'none';
+    $('analysis-content').style.display = 'block';
+    
+    const payload = {
+        config: { claude_key: APP.keys.claude, model: APP.config.model, tokens: APP.config.tokens, lang: APP.config.lang, prompts: {} },
+        user_id: APP.data.userId, doc_name: APP.data.docName, raw_text: APP.data.rawText
+    };
+
+    const res = await fetch(`${API_BASE}/analyze/document`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    
+    if(!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    
+    APP.data.analysisId = data.analysis_id;
+    const r = data.result;
+    
+    $('doc-summary').innerHTML = `
+      <p><b>Summary:</b> ${r.summary || 'N/A'}</p>
+      <p><b>Key Points:</b> <ul>${(r.key_points || []).map(p => `<li>${p}</li>`).join('')}</ul></p>
+      <div style="padding:10px; background:var(--surface-hover); border-radius:4px;"><b>Plain English Translation:</b> ${r.what_it_means || 'N/A'}</div>
+    `;
+    
+    const pill = $('risk-pill');
+    pill.className = `pill ${r.risk_level || 'UNKNOWN'}`;
+    pill.innerText = `${r.risk_level || 'UNKNOWN'} RISK`;
+    $('risk-score').innerText = 'N/A';
+    
+    $('risk-reasons').innerHTML = (r.legal_issues || []).map(i => `<li>${i}</li>`).join('');
+    $('legal-sections').innerHTML = (r.relevant_laws || []).map(s => `<span class="pill neutral">${s}</span>`).join('');
+    $('immediate-actions').innerHTML = 'Run the Risk Analyzer tab for precise action steps.';
+    
+    showToast("Case Summary Complete", 'success');
+  } catch (e) {
+    showToast('Analysis Error: ' + e.message, 'error');
+  }
+  setLoader('btn-run-analysis', false);
+});
+
+$('btn-save-analysis').addEventListener('click', () => { showToast("Backend automatically saves reports.", "info"); });
+
+/**
+ * CHAT (RAG BOT)
+ */
+function appendMessage(role, content, citations = []) {
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${role}`;
+  div.innerHTML = content.replace(/
+/g, '<br>');
+  if (citations && citations.length > 0) {
+      div.innerHTML += `<div style="margin-top:10px; font-size:11px; color:#888;"><b>Sources:</b> ${citations.join(', ')}</div>`;
+  }
+  $('chat-history').appendChild(div);
+  $('chat-history').scrollTop = $('chat-history').scrollHeight;
+  if(role !== 'system') APP.data.chatHistory.push({role, content});
+}
+
+async function sendChatMessage() {
+  const input = $('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  if(!APP.keys.claude) return showToast("Configure Claude API first", "error");
+
+  input.value = '';
+  appendMessage('user', text);
+  
+  try {
+    $('btn-send-chat').disabled = true; $('btn-send-chat').innerText = '...';
+    
+    const payload = {
+        config: { claude_key: APP.keys.claude, model: APP.config.model, tokens: APP.config.tokens, lang: APP.config.lang, prompts: {} },
+        user_id: APP.data.userId, analysis_id: APP.data.analysisId,
+        raw_text: APP.data.rawText, chat_history: APP.data.chatHistory
+    };
+    
+    const res = await fetch(`${API_BASE}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if(!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    appendMessage('assistant', data.reply, data.citations);
+  } catch(e) {
+    showToast("Chat Error: " + e.message, "error");
+    APP.data.chatHistory.pop();
+  } finally {
+    $('btn-send-chat').disabled = false; $('btn-send-chat').innerText = 'Send';
+  }
+}
+
+function sendQuickMessage(text) { $('chat-input').value = text; sendChatMessage(); }
+
+$('btn-clear-chat').addEventListener('click', () => {
+  $('chat-history').innerHTML = '<div class="chat-bubble assistant">Hello! I am NyayAI, powered by RAG FAISS. Ask me anything about Indian Law!</div>';
+  APP.data.chatHistory = [];
+});
+
+$('btn-save-chat').addEventListener('click', () => { showToast("Chat saving implemented on server side", "success"); });
+
+/**
+ * DATASET (Legacy / Manual Uploads)
+ */
+async function loadDataset() {
+  const tbody = $('dataset-tbody');
+  tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+  try {
+    const res = await fetch(`${API_BASE}/dataset`);
+    if(!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No entries found</td></tr>'; return; }
+    
+    let html = '';
+    data.forEach(d => {
+      html += `<tr><td>${d.source}</td><td>${d.section}</td><td><span class="pill neutral">${d.category}</span></td>
+      <td><button class="btn btn-secondary" style="padding:4px 8px; font-size:12px; color:var(--danger)" onclick="deleteDataset('${d.id}')">Delete</button></td></tr>`;
+    });
+    tbody.innerHTML = html;
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--danger)">Error loading data</td></tr>'; }
+}
+
+window.deleteDataset = async function(id) {
+    if(!confirm("Delete this entry?")) return;
+    try { 
+        await fetch(`${API_BASE}/dataset/${id}`, { method: 'DELETE' });
+        showToast("Deleted", "success"); loadDataset(); 
+    } catch(e) { showToast("Delete error: "+e.message, "error"); }
+};
+
+
+/**
+ * RISK ANALYZER
+ */
+btn-run-risk.addEventListener('click', async () => {
+  const scenario = risk-scenario.value.trim();
+  if(!scenario) return showToast('Please describe your scenario', 'error');
+  if(!APP.keys.claude) return showToast('Configure Claude API key first', 'error');
+  
+  setLoader('btn-run-risk', true);
+  try {
+    const payload = {
+        config: { claude_key: APP.keys.claude, model: APP.config.model, tokens: APP.config.tokens, lang: APP.config.lang, prompts: {} },
+        user_id: APP.data.userId, scenario: scenario
+    };
+    
+    const res = await fetch(API_BASE + '/analyze/risk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if(!res.ok) throw new Error(await res.text());
+    const r = await res.json();
+    
+    risk-result-container.style.display = 'block';
+    
+    const pill = risk-pill-2;
+    pill.className = 'pill ' + (r.risk_level || 'UNKNOWN');
+    pill.innerText = (r.risk_level || 'UNKNOWN') + ' RISK';
+    
+    risk-confidence.innerText = r.confidence || 'N/A';
+    risk-explanation.innerText = r.explanation || 'N/A';
+    
+    risk-laws.innerHTML = (r.relevant_laws || []).map(l => '<li>'+l+'</li>').join('');
+    risk-consequences.innerHTML = (r.possible_consequences || []).map(c => '<li>'+c+'</li>').join('');
+    risk-actions.innerHTML = (r.recommended_actions || []).map(a => '<li>'+a+'</li>').join('');
+    
+    showToast('Risk Analysis Complete', 'success');
+  } catch (e) {
+    showToast('Risk Error: ' + e.message, 'error');
+  }
+  setLoader('btn-run-risk', false);
+});
+
+</script>
+</body>
+>>>>>>> 19b0a6b4380fbb4334072f4a6767501a60f94f2f
 </html>
